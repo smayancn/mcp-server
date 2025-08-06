@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Media Viewer</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1 style="color: green;">📁 Media Files in {{ MEDIA_PATH }}</h1>
+    <ul>
+        {% for file in media_files %}
+            <li>{{ file }}</li>
+        {% endfor %}
+    </ul>
+    <hr>
+    <p><a href="/">← Back to Dashboard</a></p>
+</body>
+</html>
+

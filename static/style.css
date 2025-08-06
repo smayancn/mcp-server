@@ -1,0 +1,359 @@
+/* Google Drive-style CSS */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Google Sans', 'Roboto', 'Segoe UI', sans-serif;
+  margin: 0;
+  background: #f8f9fa;
+  color: #202124;
+}
+
+.container {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Header Bar */
+.header {
+  background: #fff;
+  border-bottom: 1px solid #dadce0;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 1px 3px rgba(60,64,67,.12);
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 400;
+  color: #5f6368;
+}
+
+.system-stats {
+  display: flex;
+  gap: 20px;
+  font-size: 14px;
+  color: #5f6368;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 260px;
+  background: #ffffff;
+  border-right: 1px solid #dadce0;
+  padding: 16px 0;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.sidebar h2 {
+  font-size: 16px;
+  margin: 0 20px 16px;
+  color: #5f6368;
+  font-weight: 500;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar li {
+  margin: 0;
+}
+
+.sidebar a {
+  text-decoration: none;
+  color: #202124;
+  display: block;
+  padding: 8px 20px;
+  border-radius: 0 20px 20px 0;
+  margin-right: 8px;
+  font-size: 14px;
+  transition: background-color 0.2s ease;
+}
+
+.sidebar a:hover {
+  background: #f1f3f4;
+}
+
+.sidebar a.active {
+  background: #e8f0fe;
+  color: #1a73e8;
+  font-weight: 500;
+}
+
+/* Folder buttons in sidebar */
+.folder-btn {
+  background: none;
+  border: none;
+  text-decoration: none;
+  color: #202124;
+  display: block;
+  padding: 8px 20px;
+  border-radius: 0 20px 20px 0;
+  margin-right: 8px;
+  font-size: 14px;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+}
+
+.folder-btn:hover {
+  background: #f1f3f4;
+}
+
+.folder-btn.active {
+  background: #e8f0fe;
+  color: #1a73e8;
+  font-weight: 500;
+}
+
+/* Controls Section */
+.controls {
+  padding: 16px 20px;
+  border-bottom: 1px solid #dadce0;
+}
+
+.control-btn {
+  background: #1a73e8;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-right: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.control-btn:hover {
+  background: #1557b0;
+}
+
+.control-btn.secondary {
+  background: #f8f9fa;
+  color: #5f6368;
+  border: 1px solid #dadce0;
+}
+
+.control-btn.secondary:hover {
+  background: #f1f3f4;
+}
+
+/* Main Panel */
+.main-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.breadcrumb {
+  background: #fff;
+  padding: 16px 20px;
+  border-bottom: 1px solid #dadce0;
+  font-size: 14px;
+  color: #5f6368;
+}
+
+.content-area {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  background: #f8f9fa;
+}
+
+/* File Grid - Fixed Layout */
+.file-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  padding: 4px;
+}
+
+.file-item {
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(60,64,67,.12), 0 1px 2px rgba(60,64,67,.24);
+  padding: 16px;
+  text-align: center;
+  transition: box-shadow 0.2s ease, transform 0.1s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.file-item:hover {
+  box-shadow: 0 2px 8px rgba(60,64,67,.15), 0 1px 4px rgba(60,64,67,.3);
+  transform: translateY(-1px);
+}
+
+/* Media Preview Container */
+.media-container {
+  width: 100%;
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  background: #f8f9fa;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.file-item img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.file-item video {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+/* File Icon for non-media files */
+.file-icon {
+  font-size: 48px;
+  color: #5f6368;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+/* File name */
+.filename {
+  font-size: 14px;
+  color: #202124;
+  word-break: break-word;
+  line-height: 1.4;
+  margin: 0 0 8px 0;
+  font-weight: 400;
+}
+
+/* Download button */
+.download-btn {
+  background: #1a73e8;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: background-color 0.2s ease;
+}
+
+.download-btn:hover {
+  background: #1557b0;
+  color: white;
+}
+
+/* Folder items in grid */
+.folder-item {
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(60,64,67,.12), 0 1px 2px rgba(60,64,67,.24);
+  padding: 16px;
+  text-align: center;
+  transition: box-shadow 0.2s ease, transform 0.1s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  border: 2px solid transparent;
+}
+
+.folder-item:hover {
+  box-shadow: 0 2px 8px rgba(60,64,67,.15), 0 1px 4px rgba(60,64,67,.3);
+  transform: translateY(-1px);
+  border-color: #1a73e8;
+}
+
+.folder-item .folder-icon {
+  font-size: 48px;
+  color: #1a73e8;
+  margin-bottom: 12px;
+}
+
+/* Mixed grid for folders and files */
+.mixed-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  padding: 4px;
+}
+
+/* Section headers */
+.section-header {
+  font-size: 18px;
+  font-weight: 500;
+  color: #202124;
+  margin: 24px 0 16px 0;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #dadce0;
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  color: #5f6368;
+  font-size: 16px;
+  margin-top: 60px;
+}
+
+.empty-state .icon {
+  font-size: 72px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+/* Loading state */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: #5f6368;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+  
+  .sidebar {
+    width: 100%;
+    height: auto;
+    max-height: 200px;
+  }
+  
+  .file-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+  }
+  
+  .media-container {
+    height: 120px;
+  }
+}
+

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MCP Dashboard - Media Center</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <!-- Header Bar -->
+  <div class="header">
+    <h1>🗂️ MCP Media Center</h1>
+    <div class="system-stats" id="system-stats">
+      <div class="stat-item">
+        <span>💾</span>
+        <span id="cpu-stat">CPU: --</span>
+      </div>
+      <div class="stat-item">
+        <span>🧠</span>
+        <span id="memory-stat">RAM: --</span>
+      </div>
+      <div class="stat-item">
+        <span>💽</span>
+        <span id="disk-stat">Disk: --</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="controls">
+        <button class="control-btn" id="restart-samba">🔄 Restart Samba</button>
+        <button class="control-btn secondary" id="refresh-stats">📊 Refresh Stats</button>
+      </div>
+      
+      <h2>📁 Root Folders</h2>
+      <ul id="folder-list">
+        {% for folder in directory_tree %}
+          <li>
+            <button class="folder-btn {% if folder.path == current_path %}active{% endif %}" 
+                    onclick="loadFolderContents('{{ folder.path }}', this)">
+              📁 {{ folder.name }}
+            </button>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <!-- Main Panel -->
+    <div class="main-panel">
+      <div class="breadcrumb">
+        📍 Current Path: /media/nas{% if current_path %}/{{ current_path }}{% endif %}
+      </div>
+      
+      <div class="content-area" id="content-area">
+        <div class="loading" id="loading" style="display: none;">
+          Loading...
+        </div>
+        
+        <div id="folder-contents">
+          <!-- Content will be loaded dynamically -->
+          <div class="empty-state">
+            <div class="icon">📂</div>
+            <p>Select a folder from the left panel to view its contents</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
+

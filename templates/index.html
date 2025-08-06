@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MCP Dashboard</title>
+    <style>
+        body { font-family: Arial, background-color: #1e1e1e; color: white; padding: 20px; }
+        h1 { color: #00ffe1; }
+        .file { padding: 5px 0; }
+    </style>
+</head>
+<body>
+    <h1>MCP Dashboard</h1>
+    <p>Total files found: {{ media_files|length }}</p>
+
+    <div>
+        {% for file in media_files %}
+            <div class="file">{{ file }}</div>
+        {% endfor %}
+    </div>
+</body>
+</html>
+
