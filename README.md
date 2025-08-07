@@ -1,4 +1,4 @@
-# MCP Server - Media Center Platform
+# MCP Server
 
 A fast, aesthetic, Google Drive-style web dashboard for managing local media, monitoring system diagnostics, and controlling server services — built using FastAPI and vanilla JavaScript.
 
