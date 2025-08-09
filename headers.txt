@@ -1,0 +1,7 @@
+HTTP/1.1 302 Found
+date: Sat, 09 Aug 2025 15:53:29 GMT
+server: uvicorn
+content-length: 0
+location: /
+set-cookie: session_token=fcc0a3ba7f9459ef1f930088df9d3058416d6cafc12f960abd0c41451cc365d1; HttpOnly; Max-Age=86400; Path=/; SameSite=lax
+

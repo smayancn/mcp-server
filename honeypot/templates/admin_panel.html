@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🍯 Honeypot Admin Panel</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      background: #1a1a1a;
+      color: #e0e0e0;
+    }
+
+    .header {
+      background: #2d2d2d;
+      padding: 20px;
+      border-bottom: 2px solid #ff6b35;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header h1 {
+      margin: 0;
+      color: #ff6b35;
+      font-size: 24px;
+    }
+
+    .status {
+      display: flex;
+      gap: 20px;
+      font-size: 14px;
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-online {
+      color: #4caf50;
+    }
+
+    .dashboard {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      padding: 20px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .panel {
+      background: #2d2d2d;
+      border-radius: 8px;
+      padding: 20px;
+      border: 1px solid #404040;
+    }
+
+    .panel h2 {
+      margin: 0 0 15px 0;
+      color: #ff6b35;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: #1a1a1a;
+      padding: 15px;
+      border-radius: 6px;
+      text-align: center;
+      border: 1px solid #404040;
+    }
+
+    .stat-number {
+      font-size: 24px;
+      font-weight: bold;
+      color: #ff6b35;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: #b0b0b0;
+      margin-top: 5px;
+    }
+
+    .log-container {
+      max-height: 400px;
+      overflow-y: auto;
+      background: #1a1a1a;
+      border-radius: 6px;
+      padding: 15px;
+    }
+
+    .log-entry {
+      border-bottom: 1px solid #404040;
+      padding: 10px 0;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+    }
+
+    .log-entry:last-child {
+      border-bottom: none;
+    }
+
+    .log-timestamp {
+      color: #888;
+    }
+
+    .log-ip {
+      color: #4caf50;
+      font-weight: bold;
+    }
+
+    .log-username {
+      color: #ff9800;
+    }
+
+    .log-password {
+      color: #f44336;
+    }
+
+    .refresh-btn {
+      background: #ff6b35;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-bottom: 15px;
+    }
+
+    .refresh-btn:hover {
+      background: #e55a2b;
+    }
+
+    .full-width {
+      grid-column: 1 / -1;
+    }
+
+    .session-entry {
+      background: #1a1a1a;
+      margin: 10px 0;
+      padding: 15px;
+      border-radius: 6px;
+      border-left: 4px solid #ff6b35;
+    }
+
+    .session-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .session-id {
+      font-family: 'Courier New', monospace;
+      color: #4caf50;
+      font-weight: bold;
+    }
+
+    .session-details {
+      color: #b0b0b0;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🍯 Honeypot Control Center</h1>
+    <div class="status">
+      <div class="status-item status-online">
+        <span>●</span>
+        <span>ACTIVE</span>
+      </div>
+      <div class="status-item">
+        <span>🕒</span>
+        <span id="current-time"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard">
+    <!-- Statistics Panel -->
+    <div class="panel">
+      <h2>📊 Attack Statistics</h2>
+      <button class="refresh-btn" onclick="refreshData()">↻ Refresh</button>
+      <div class="stats-grid" id="stats-grid">
+        <div class="stat-card">
+          <div class="stat-number" id="total-attempts">-</div>
+          <div class="stat-label">Login Attempts</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="unique-attackers">-</div>
+          <div class="stat-label">Unique IPs</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="active-sessions">-</div>
+          <div class="stat-label">Active Sessions</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Login Attempts -->
+    <div class="panel">
+      <h2>🔐 Recent Login Attempts</h2>
+      <div class="log-container" id="login-attempts">
+        <div class="log-entry">Loading attack data...</div>
+      </div>
+    </div>
+
+    <!-- Active Sessions -->
+    <div class="panel full-width">
+      <h2>👥 Attack Sessions</h2>
+      <div id="attack-sessions">
+        <div class="session-entry">Loading session data...</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function updateTime() {
+      document.getElementById('current-time').textContent = 
+        new Date().toLocaleTimeString();
+    }
+
+    async function refreshData() {
+      try {
+        const response = await fetch('/honeypot/api/attacks');
+        const data = await response.json();
+        
+        // Update statistics
+        document.getElementById('total-attempts').textContent = 
+          data.stats.total_attempts;
+        document.getElementById('unique-attackers').textContent = 
+          data.stats.unique_attackers;
+        document.getElementById('active-sessions').textContent = 
+          data.stats.active_sessions;
+        
+        // Update login attempts
+        const loginContainer = document.getElementById('login-attempts');
+        loginContainer.innerHTML = '';
+        
+        if (data.login_attempts.length === 0) {
+          loginContainer.innerHTML = '<div class="log-entry">No attacks detected yet</div>';
+        } else {
+          data.login_attempts.forEach(attempt => {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `
+              <span class="log-timestamp">${new Date(attempt.timestamp).toLocaleString()}</span><br>
+              IP: <span class="log-ip">${attempt.ip_address}</span> | 
+              User: <span class="log-username">${attempt.username}</span> | 
+              Pass: <span class="log-password">${attempt.password}</span><br>
+              <small>Session: ${attempt.session_id} | Agent: ${attempt.user_agent.substring(0, 50)}...</small>
+            `;
+            loginContainer.appendChild(entry);
+          });
+        }
+        
+        // Update sessions
+        const sessionsContainer = document.getElementById('attack-sessions');
+        sessionsContainer.innerHTML = '';
+        
+        if (data.sessions.length === 0) {
+          sessionsContainer.innerHTML = '<div class="session-entry">No active sessions</div>';
+        } else {
+          data.sessions.forEach(session => {
+            const sessionDiv = document.createElement('div');
+            sessionDiv.className = 'session-entry';
+            sessionDiv.innerHTML = `
+              <div class="session-header">
+                <span class="session-id">${session.session_id}</span>
+                <span class="session-details">
+                  ${session.total_requests} requests | ${session.attack_type || 'unknown'}
+                </span>
+              </div>
+              <div class="session-details">
+                IP: ${session.ip_address} | 
+                Started: ${new Date(session.start_time).toLocaleString()} | 
+                Last: ${new Date(session.last_activity).toLocaleString()}
+              </div>
+            `;
+            sessionsContainer.appendChild(sessionDiv);
+          });
+        }
+        
+      } catch (error) {
+        console.error('Failed to refresh data:', error);
+      }
+    }
+
+    // Initialize
+    updateTime();
+    setInterval(updateTime, 1000);
+    refreshData();
+    
+    // Auto-refresh every 30 seconds
+    setInterval(refreshData, 30000);
+    
+    // Add some visual feedback
+    let refreshButton = document.querySelector('.refresh-btn');
+    function originalRefresh() {
+      refreshButton.textContent = '🔄 Refreshing...';
+      refreshButton.disabled = true;
+      
+      setTimeout(() => {
+        refreshButton.textContent = '↻ Refresh';
+        refreshButton.disabled = false;
+      }, 1000);
+      
+      refreshData();
+    }
+    
+    window.refreshData = originalRefresh;
+  </script>
+</body>
+</html>

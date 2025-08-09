@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MCP Media Center - Secure Login</title>
+  <style>
+    /* Same styling as honeypot but with subtle differences to distinguish real from fake */
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Google Sans', 'Roboto', 'Segoe UI', sans-serif;
+      margin: 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #202124;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .login-container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      padding: 50px;
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+      backdrop-filter: blur(10px);
+    }
+
+    .logo {
+      font-size: 48px;
+      margin-bottom: 16px;
+      color: #1a73e8;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 500;
+      margin: 0 0 8px 0;
+      color: #202124;
+    }
+
+    .subtitle {
+      color: #5f6368;
+      font-size: 16px;
+      margin-bottom: 40px;
+      font-weight: 300;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+      text-align: left;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #202124;
+      font-size: 14px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 16px 20px;
+      border: 2px solid #e8eaed;
+      border-radius: 8px;
+      font-size: 16px;
+      background: #fff;
+      transition: all 0.3s ease;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #1a73e8;
+      box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .login-btn {
+      background: linear-gradient(135deg, #1a73e8 0%, #1557b0 100%);
+      color: white;
+      border: none;
+      padding: 16px 32px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 20px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(26, 115, 232, 0.3);
+    }
+
+    .login-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(26, 115, 232, 0.4);
+    }
+
+    .login-btn:active {
+      transform: translateY(0);
+    }
+
+    .error {
+      background: linear-gradient(135deg, #ff5722 0%, #f44336 100%);
+      color: white;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      border: none;
+      font-weight: 500;
+      box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+    }
+
+    .footer {
+      margin-top: 40px;
+      color: #5f6368;
+      font-size: 14px;
+      font-weight: 300;
+    }
+
+    .security-badge {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(76, 175, 80, 0.9);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
+    .version-info {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 12px;
+      font-weight: 300;
+    }
+
+    .honeypot-warning {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 10px;
+      font-style: italic;
+    }
+
+    /* Subtle animation */
+    .login-container {
+      animation: slideIn 0.6s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="security-badge">
+    🔒 SECURE CONNECTION
+  </div>
+  
+  <div class="login-container">
+    <div class="logo">🗂️</div>
+    <h1>MCP Media Center</h1>
+    <p class="subtitle">Authorized Access Only</p>
+    
+    {% if error %}
+    <div class="error">
+      🚫 {{ error }}
+    </div>
+    {% endif %}
+    
+    <form method="post" action="/login">
+      <div class="form-group">
+        <label for="username">👤 Username</label>
+        <input 
+          type="text" 
+          id="username" 
+          name="username" 
+          required 
+          autocomplete="username"
+          placeholder="Enter your username"
+        >
+      </div>
+      
+      <div class="form-group">
+        <label for="password">🔑 Password</label>
+        <input 
+          type="password" 
+          id="password" 
+          name="password" 
+          required 
+          autocomplete="current-password"
+          placeholder="Enter your password"
+        >
+      </div>
+      
+      <button type="submit" class="login-btn">🚀 Sign In Securely</button>
+    </form>
+    
+    <div class="footer">
+      <p><strong>MCP v2.1.0</strong> | Enterprise File System</p>
+      <p><small>🛡️ Protected by advanced security protocols</small></p>
+    </div>
+  </div>
+  
+  <div class="version-info">
+    MCP-REAL-SERVER | Build 2024.01
+  </div>
+  
+  <div class="honeypot-warning">
+    ⚠️ Unauthorized access attempts are monitored
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Focus username field
+      document.getElementById('username').focus();
+      
+      // Form submission feedback
+      const form = document.querySelector('form');
+      const button = document.querySelector('.login-btn');
+      
+      form.addEventListener('submit', function() {
+        button.innerHTML = '🔄 Authenticating...';
+        button.disabled = true;
+      });
+      
+      // Security indicator
+      console.log('🔒 MCP Real Server - Secure Authentication Portal');
+      console.log('⚠️ This is the REAL file server - honeypot is on port 8001');
+    });
+  </script>
+</body>
+</html>

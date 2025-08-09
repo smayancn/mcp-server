@@ -1,13 +1,18 @@
-from fastapi import FastAPI, Request, HTTPException, UploadFile, File, Form
-from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
+from fastapi import FastAPI, Request, HTTPException, UploadFile, File, Form, Depends, status
+from fastapi.responses import HTMLResponse, FileResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pathlib import Path
 import mimetypes
 import psutil
 import subprocess
 import shutil
 import aiofiles
+import secrets
+import hashlib
+from datetime import datetime, timedelta
+from typing import Optional
 from utils import get_directory_structure, get_file_list, get_folder_contents, generate_thumbnail  # defined in utils.py
 
 app = FastAPI()
@@ -17,9 +22,119 @@ BASE_PATH = Path("/media/mint/shared")  # NTFS shared partition
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
+# Authentication Configuration
+ADMIN_USERNAME = "admin"
+ADMIN_PASSWORD = "admin"
+SECRET_KEY = secrets.token_hex(32)
+ALGORITHM = "HS256"
+
+# Simple session storage (in production, use Redis or database)
+active_sessions = {}
+
+class SessionManager:
+    @staticmethod
+    def create_session(username: str) -> str:
+        session_token = secrets.token_hex(32)
+        active_sessions[session_token] = {
+            "username": username,
+            "created_at": datetime.now(),
+            "last_activity": datetime.now()
+        }
+        return session_token
+    
+    @staticmethod
+    def validate_session(session_token: str) -> Optional[dict]:
+        if session_token in active_sessions:
+            session = active_sessions[session_token]
+            # Check if session is still valid (24 hours)
+            if datetime.now() - session["created_at"] < timedelta(hours=24):
+                # Update last activity
+                session["last_activity"] = datetime.now()
+                return session
+            else:
+                # Session expired, remove it
+                del active_sessions[session_token]
+        return None
+    
+    @staticmethod
+    def remove_session(session_token: str):
+        if session_token in active_sessions:
+            del active_sessions[session_token]
+
+def get_session_token(request: Request) -> Optional[str]:
+    """Extract session token from cookies"""
+    return request.cookies.get("session_token")
+
+class AuthenticationRequired(Exception):
+    pass
+
+def require_auth(request: Request) -> dict:
+    """Dependency to require authentication"""
+    session_token = get_session_token(request)
+    if not session_token:
+        raise AuthenticationRequired()
+    
+    session = SessionManager.validate_session(session_token)
+    if not session:
+        raise AuthenticationRequired()
+    
+    return session
+
+@app.exception_handler(AuthenticationRequired)
+async def auth_exception_handler(request: Request, exc: AuthenticationRequired):
+    """Redirect unauthenticated users to login"""
+    return RedirectResponse(url="/login", status_code=302)
+
+
+@app.get("/login", response_class=HTMLResponse)
+async def login_page(request: Request, error: str = None):
+    """Display login page"""
+    # Check if already logged in
+    session_token = get_session_token(request)
+    if session_token and SessionManager.validate_session(session_token):
+        return RedirectResponse(url="/", status_code=302)
+    
+    return templates.TemplateResponse("login.html", {
+        "request": request,
+        "error": error
+    })
+
+@app.post("/login")
+async def login(request: Request, username: str = Form(...), password: str = Form(...)):
+    """Handle login form submission"""
+    if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
+        # Create session
+        session_token = SessionManager.create_session(username)
+        
+        # Redirect to dashboard with session cookie
+        response = RedirectResponse(url="/", status_code=302)
+        response.set_cookie(
+            key="session_token", 
+            value=session_token,
+            max_age=86400,  # 24 hours
+            httponly=True,
+            secure=False,  # Set to True in production with HTTPS
+            samesite="lax"
+        )
+        return response
+    else:
+        # Invalid credentials, redirect back to login with error
+        return RedirectResponse(url="/login?error=Invalid username or password", status_code=302)
+
+@app.get("/logout")
+async def logout(request: Request):
+    """Handle logout"""
+    session_token = get_session_token(request)
+    if session_token:
+        SessionManager.remove_session(session_token)
+    
+    response = RedirectResponse(url="/login", status_code=302)
+    response.delete_cookie("session_token")
+    return response
 
 @app.get("/", response_class=HTMLResponse)
-async def dashboard(request: Request, path: str = ""):
+async def dashboard(request: Request, path: str = "", session: dict = Depends(require_auth)):
+    """Main dashboard - requires authentication"""
     current_path = (BASE_PATH / path).resolve()
     if not current_path.exists() or not current_path.is_dir():
         return HTMLResponse(content="Invalid path", status_code=404)
@@ -31,12 +146,13 @@ async def dashboard(request: Request, path: str = ""):
         "request": request,
         "directory_tree": directory_tree,
         "files": files,
-        "current_path": str(current_path.relative_to(BASE_PATH))
+        "current_path": str(current_path.relative_to(BASE_PATH)),
+        "username": session["username"]
     })
 
 
 @app.get("/file/{file_path:path}")
-async def serve_file(file_path: str):
+async def serve_file(file_path: str, request: Request, session: dict = Depends(require_auth)):
     full_path = (BASE_PATH / file_path).resolve()
     if not full_path.exists():
         return HTMLResponse("File not found", status_code=404)
@@ -48,7 +164,7 @@ async def serve_file(file_path: str):
 # === API ENDPOINTS ===
 
 @app.get("/api/diagnostics")
-async def get_system_diagnostics():
+async def get_system_diagnostics(session: dict = Depends(require_auth)):
     """Get real-time system diagnostics"""
     try:
         cpu_percent = psutil.cpu_percent(interval=1)
@@ -137,7 +253,7 @@ async def get_favicon():
 
 
 @app.get("/api/folder-contents")
-async def get_folder_contents_api(folder_path: str = ""):
+async def get_folder_contents_api(folder_path: str = "", session: dict = Depends(require_auth)):
     """Get contents of a specific folder for the right panel"""
     try:
         if folder_path:
@@ -187,7 +303,7 @@ async def download_file(file_path: str):
 
 
 @app.post("/api/upload")
-async def upload_file(file: UploadFile = File(...), folder_path: str = Form("")):
+async def upload_file(file: UploadFile = File(...), folder_path: str = Form(""), session: dict = Depends(require_auth)):
     """Upload a file to the specified folder"""
     try:
         # Determine target directory

@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MCP Dashboard - Media Center</title>
+  <style>
+    /* Copy the exact styling from real dashboard but with fake content */
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Google Sans', 'Roboto', 'Segoe UI', sans-serif;
+      margin: 0;
+      background: #f8f9fa;
+      color: #202124;
+    }
+
+    .container {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Header Bar */
+    .header {
+      background: #fff;
+      border-bottom: 1px solid #dadce0;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 1px 3px rgba(60,64,67,.12);
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 400;
+      color: #5f6368;
+    }
+
+    .system-stats {
+      display: flex;
+      gap: 20px;
+      font-size: 14px;
+      color: #5f6368;
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 260px;
+      background: #ffffff;
+      border-right: 1px solid #dadce0;
+      padding: 16px 0;
+      overflow-y: auto;
+      min-height: 0;
+    }
+
+    .sidebar h2 {
+      font-size: 16px;
+      margin: 0 20px 16px;
+      color: #5f6368;
+      font-weight: 500;
+    }
+
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .folder-btn {
+      background: none;
+      border: none;
+      color: #202124;
+      display: block;
+      padding: 8px 20px;
+      border-radius: 0 20px 20px 0;
+      margin-right: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      width: 100%;
+      text-align: left;
+      transition: background-color 0.2s ease;
+    }
+
+    .folder-btn:hover {
+      background: #f1f3f4;
+    }
+
+    /* Main Panel */
+    .main-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .breadcrumb {
+      background: #fff;
+      padding: 16px 20px;
+      border-bottom: 1px solid #dadce0;
+      font-size: 14px;
+      color: #5f6368;
+    }
+
+    .content-area {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      background: #f8f9fa;
+    }
+
+    .file-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+      padding: 4px;
+    }
+
+    .file-item {
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(60,64,67,.12), 0 1px 2px rgba(60,64,67,.24);
+      padding: 16px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .file-item:hover {
+      box-shadow: 0 2px 8px rgba(60,64,67,.15), 0 1px 4px rgba(60,64,67,.3);
+    }
+
+    .file-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+
+    .filename {
+      font-size: 14px;
+      color: #202124;
+      word-break: break-word;
+    }
+
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      color: #5f6368;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header Bar -->
+  <div class="header">
+    <h1>🗂️ MCP Media Center</h1>
+    <div class="system-stats">
+      <div class="stat-item">
+        <span>💾</span>
+        <span>CPU: 23.4%</span>
+      </div>
+      <div class="stat-item">
+        <span>🧠</span>
+        <span>RAM: 6.2/16.0 GB (38.8%)</span>
+      </div>
+      <div class="stat-item">
+        <span>💽</span>
+        <span>Disk: 892.1/1863.2 GB (47.9%)</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <h2>📁 Root Folders</h2>
+      <ul>
+        <li><button class="folder-btn" onclick="loadFolder('Documents')">📁 Documents</button></li>
+        <li><button class="folder-btn" onclick="loadFolder('Pictures')">📁 Pictures</button></li>
+        <li><button class="folder-btn" onclick="loadFolder('Videos')">📁 Videos</button></li>
+        <li><button class="folder-btn" onclick="loadFolder('Music')">📁 Music</button></li>
+        <li><button class="folder-btn" onclick="loadFolder('Downloads')">📁 Downloads</button></li>
+        <li><button class="folder-btn" onclick="loadFolder('Backup')">📁 Backup</button></li>
+        <li><button class="folder-btn" onclick="loadFolder('Projects')">📁 Projects</button></li>
+        <li><button class="folder-btn" onclick="loadFolder('Archive')">📁 Archive</button></li>
+      </ul>
+    </div>
+
+    <!-- Main Panel -->
+    <div class="main-panel">
+      <div class="breadcrumb">
+        📍 Current Path: /media/mint/shared
+      </div>
+      
+      <div class="content-area">
+        <div id="loading" class="loading">
+          🔍 Loading file system... Please wait
+        </div>
+        
+        <div id="file-grid" class="file-grid" style="display: none;">
+          <!-- Fake files will be loaded here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Log all interactions for honeypot analysis
+    function logAction(action, details) {
+      const logEntry = {
+        timestamp: new Date().toISOString(),
+        action: action,
+        details: details,
+        userAgent: navigator.userAgent,
+        ip: '{{ request.client.host }}'
+      };
+      
+      // In a real scenario, this would send to logging endpoint
+      console.log('HONEYPOT LOG:', logEntry);
+      
+      // Store in sessionStorage for potential analysis
+      const logs = JSON.parse(sessionStorage.getItem('honeypot_logs') || '[]');
+      logs.push(logEntry);
+      sessionStorage.setItem('honeypot_logs', JSON.stringify(logs));
+    }
+
+    function loadFolder(folderName) {
+      logAction('folder_click', { folder: folderName });
+      
+      const loading = document.getElementById('loading');
+      const fileGrid = document.getElementById('file-grid');
+      
+      loading.style.display = 'flex';
+      fileGrid.style.display = 'none';
+      
+      // Simulate loading delay
+      setTimeout(() => {
+        loading.style.display = 'none';
+        fileGrid.style.display = 'grid';
+        
+        // Generate fake files based on folder
+        const fakeFiles = generateFakeFiles(folderName);
+        displayFiles(fakeFiles);
+        
+        // Update breadcrumb
+        document.querySelector('.breadcrumb').textContent = 
+          `📍 Current Path: /media/mint/shared/${folderName}`;
+      }, 1500);
+    }
+
+    function generateFakeFiles(folderName) {
+      const fileTypes = {
+        'Documents': [
+          { name: 'Annual_Report_2023.pdf', icon: '📄', size: '2.4 MB' },
+          { name: 'Financial_Data.xlsx', icon: '📊', size: '1.8 MB' },
+          { name: 'Project_Plans.docx', icon: '📝', size: '945 KB' },
+          { name: 'Meeting_Notes.txt', icon: '📋', size: '34 KB' },
+          { name: 'Client_Database.csv', icon: '📈', size: '5.2 MB' }
+        ],
+        'Pictures': [
+          { name: 'vacation_2023.jpg', icon: '🖼️', size: '4.2 MB' },
+          { name: 'family_portrait.png', icon: '🖼️', size: '6.8 MB' },
+          { name: 'office_party.jpg', icon: '🖼️', size: '3.1 MB' },
+          { name: 'passport_scan.pdf', icon: '📄', size: '1.2 MB' }
+        ],
+        'Videos': [
+          { name: 'presentation_recording.mp4', icon: '🎬', size: '145 MB' },
+          { name: 'training_video.avi', icon: '🎬', size: '89 MB' },
+          { name: 'security_footage.mkv', icon: '🎬', size: '234 MB' }
+        ],
+        'Backup': [
+          { name: 'database_backup_20231201.sql', icon: '💾', size: '45 MB' },
+          { name: 'system_config.tar.gz', icon: '📦', size: '12 MB' },
+          { name: 'user_profiles.zip', icon: '📦', size: '8.7 MB' }
+        ]
+      };
+      
+      return fileTypes[folderName] || [
+        { name: 'sample_file.txt', icon: '📄', size: '1 KB' }
+      ];
+    }
+
+    function displayFiles(files) {
+      const fileGrid = document.getElementById('file-grid');
+      fileGrid.innerHTML = '';
+      
+      files.forEach(file => {
+        const fileDiv = document.createElement('div');
+        fileDiv.className = 'file-item';
+        fileDiv.onclick = () => {
+          logAction('file_click', { filename: file.name, size: file.size });
+          alert(`Accessing ${file.name}...\nThis feature requires additional authentication.`);
+        };
+        
+        fileDiv.innerHTML = `
+          <div class="file-icon">${file.icon}</div>
+          <div class="filename">${file.name}</div>
+          <div style="font-size: 12px; color: #5f6368; margin-top: 4px;">${file.size}</div>
+        `;
+        
+        fileGrid.appendChild(fileDiv);
+      });
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      logAction('dashboard_loaded', { timestamp: new Date().toISOString() });
+      
+      // Auto-load after a delay to seem realistic
+      setTimeout(() => {
+        loadFolder('Documents');
+      }, 2000);
+    });
+
+    // Log when user leaves
+    window.addEventListener('beforeunload', function() {
+      logAction('session_end', { 
+        duration: performance.now(),
+        logs_captured: JSON.parse(sessionStorage.getItem('honeypot_logs') || '[]').length
+      });
+    });
+  </script>
+</body>
+</html>

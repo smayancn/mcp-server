@@ -1,115 +1,187 @@
-# MCP Server
+# 🔒 MCP Secure Media Center with Integrated Honeypot
 
-A fast, aesthetic, Google Drive-style web dashboard for managing local media, monitoring system diagnostics, and controlling server services — built using FastAPI and vanilla JavaScript.
+A professional-grade, secure file hosting system with built-in cybersecurity honeypot for threat detection and analysis. Features Google Drive-style interface, authenticated access, and real-time attack monitoring.
 
-![MCP Server Dashboard](https://img.shields.io/badge/FastAPI-0.116.1-green) ![Python](https://img.shields.io/badge/Python-3.10+-blue) ![License](https://img.shields.io/badge/License-MIT-yellow)
+![MCP Server Dashboard](https://img.shields.io/badge/FastAPI-0.116.1-green) ![Python](https://img.shields.io/badge/Python-3.10+-blue) ![Security](https://img.shields.io/badge/Security-Honeypot%20Enabled-red) ![License](https://img.shields.io/badge/License-MIT-yellow)
 
-## ✨ Features
+## 🌟 System Architecture
 
-### 📁 Interactive File Explorer
-- **Smart Left Panel**: Shows only root folders from `/media/nas`
-- **Dynamic Right Panel**: Displays folder contents (subfolders + files) when clicking left panel folders
-- **Responsive Grid View**: Beautiful rectangular grid layout with thumbnails for images/videos
-- **Breadcrumb Navigation**: Real-time path updates as you navigate
-- **File Type Detection**: Smart icons for different file types (images, videos, documents, etc.)
+### 🏗️ **Dual-Server Security Design**
+```
+Port 8000: 🔒 Secure File Server    (Your real files - authenticated access)
+Port 8001: 🍯 Security Honeypot     (Captures attackers - fake interface)
+```
 
-### 💻 System Diagnostics
-- **Real-time Monitoring**: Live CPU, memory, and disk usage stats in header
-- **Auto-refresh**: Stats update every 30 seconds automatically
-- **RESTful API**: `/api/diagnostics` endpoint for system information
+## ✨ Core Features
 
-### 🔄 Service Controls
-- **One-click Samba Restart**: Restart Samba service with a single button click
-- **Interactive Feedback**: Loading states and success/error notifications
-- **Secure Operations**: Proper sudo access checks and timeout protection
+### 🔐 **Enterprise Authentication**
+- **Secure Login System**: Session-based authentication with HTTP-only cookies
+- **Credential Protection**: Default admin/admin (customizable)
+- **Session Management**: 24-hour secure sessions with auto-expiration
+- **Access Control**: All endpoints protected behind authentication
+- **Auto-redirect**: Unauthorized users redirected to login
 
-### 🖼️ Advanced Thumbnails
-- **Auto-generated**: Thumbnails for images and videos (200x200px)
-- **Smart Caching**: Hash-based filename caching system
-- **Performance Optimized**: Only regenerates when source file is newer
+### 🍯 **Integrated Security Honeypot**
+- **Attack Capture**: Fake login interface that logs all intrusion attempts
+- **Real-time Monitoring**: Live dashboard showing attack statistics
+- **Behavioral Analysis**: Session tracking and attacker profiling
+- **Database Logging**: SQLite + JSON logs for forensic analysis
+- **Admin Dashboard**: Professional security monitoring interface
+
+### 📁 **Secure File Management**
+- **Smart Left Panel**: Shows only root folders from your configured path
+- **Dynamic Right Panel**: Displays folder contents with thumbnails
+- **Responsive Grid View**: Beautiful layout with image/video previews
+- **Upload Functionality**: Secure file upload with folder organization
+- **Download Protection**: Authenticated downloads with proper headers
+
+### 💻 **System Monitoring**
+- **Real-time Diagnostics**: Live CPU, memory, and disk usage
+- **Auto-refresh Stats**: Updates every 30 seconds automatically
+- **Performance Metrics**: Comprehensive system health monitoring
+- **Service Controls**: Integrated Samba service management
+
+### 🖼️ **Advanced Media Features**
+- **Auto-generated Thumbnails**: Smart caching for images and videos
 - **Format Support**: JPG, PNG, GIF, WebP, MP4, AVI, MOV, MKV, etc.
+- **Modal Viewers**: Full-screen media viewing experience
+- **Performance Optimized**: Efficient thumbnail generation and caching
 
-### ⬇️ Universal Downloads
-- **Everything Downloadable**: Download buttons on all files
-- **Secure Downloads**: Proper security checks and MIME type detection
-- **Direct File Access**: `/file/{path}` endpoint for direct media serving
-- **Download API**: `/api/download/{path}` with proper headers
-
-### 🎨 Modern UI/UX
-- **Google Drive Inspired**: Clean, professional design with modern aesthetics
-- **Modal Viewers**: Full-screen image and video viewing
-- **Responsive Design**: Works perfectly on desktop, tablet, and mobile
+### 🎨 **Professional UI/UX**
+- **Google Drive Inspired**: Clean, modern design
+- **Responsive Design**: Perfect on desktop, tablet, and mobile
 - **Toast Notifications**: User feedback for all actions
-- **Loading States**: Smooth loading indicators during operations
+- **Loading States**: Smooth indicators during operations
+- **Security Indicators**: Visual cues for secure vs honeypot interfaces
 
 ## 📁 Project Structure
 
 ```
 mcp-server/
-├── mcp-drive/                    # Main application directory
-│   ├── main.py                   # FastAPI server and API endpoints
-│   ├── utils.py                  # Directory utilities and thumbnail generation
-│   ├── models.py                 # Pydantic models for data validation
-│   ├── start.py                  # Application launcher (auto-opens browser)
+├── 🔒 SECURE FILE SERVER (Port 8000)
+│   ├── main.py                   # FastAPI server with authentication
+│   ├── utils.py                  # Directory utilities and thumbnails
+│   ├── models.py                 # Pydantic data models
+│   ├── start.py                  # Dual-server launcher
 │   ├── requirements.txt          # Python dependencies
 │   ├── static/                   # Frontend assets
-│   │   ├── app.js               # JavaScript for UI interactivity
-│   │   ├── style.css            # Google Drive-style CSS
+│   │   ├── app.js               # UI interactivity + upload/download
+│   │   ├── style.css            # Google Drive-style design
 │   │   └── icons/               # File type icons
 │   ├── templates/               # Jinja2 HTML templates
-│   │   ├── dashboard.html       # Main UI template
+│   │   ├── login.html           # Secure authentication page
+│   │   ├── dashboard.html       # Main file management UI
 │   │   └── ...
-│   ├── thumbnails/              # Auto-generated thumbnails
-│   ├── cache/                   # Application cache
-│   ├── logs/                    # Application logs
 │   └── venv/                    # Python virtual environment
-└── README.md                    # This file
+│
+├── 🍯 SECURITY HONEYPOT (Port 8001)
+│   ├── honeypot_main.py         # Honeypot FastAPI server
+│   ├── start_honeypot.py        # Standalone honeypot launcher
+│   ├── templates/               # Fake interfaces
+│   │   ├── fake_login.html      # Attacker trap login page
+│   │   ├── fake_dashboard.html  # Fake file browser
+│   │   └── admin_panel.html     # Security monitoring dashboard
+│   ├── database/                # Attack logging database
+│   │   └── honeypot.db         # SQLite attack records
+│   ├── logs/                    # JSON attack logs
+│   └── README.md               # Honeypot documentation
+│
+├── 📊 GENERATED DATA
+│   ├── thumbnails/              # Auto-generated media thumbnails
+│   ├── cache/                   # Application cache
+│   └── logs/                    # System logs
+│
+└── 📖 DOCUMENTATION
+    └── README.md                # This comprehensive guide
 ```
+
+## 🚀 Quick Start
+
+### 1. **Installation**
+```bash
+# Clone or download the project
+cd /your/project/path/mcp-server
+
+# Create virtual environment
+python3 -m venv venv
+source venv/bin/activate  # Linux/Mac
+# or
+venv\Scripts\activate     # Windows
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+### 2. **Launch Complete System**
+```bash
+# Start both servers automatically
+python3 start.py
+```
+
+**System automatically opens:**
+- 🔒 **Secure File Server**: `http://localhost:8000`
+- 🍯 **Honeypot**: `http://localhost:8001` (attackers)
+- 📊 **Security Dashboard**: `http://localhost:8001/honeypot/admin`
+
+### 3. **Access Your Files**
+- **Username**: `admin`
+- **Password**: `admin`
+- **Login at**: `http://localhost:8000`
 
 ## 🔧 Configuration
 
-### Media Path Configuration
-The default media path is set to `/media/nas`. To change this:
-
-1. Edit `main.py`:
-   ```python
-   BASE_PATH = Path("/your/custom/path")
-   ```
-
-2. Ensure the path exists and has proper read permissions
-
-### Thumbnail Settings
-Thumbnail generation can be customized in `utils.py`:
+### **Media Path Setup**
+Configure your file location in `main.py`:
 
 ```python
-def generate_thumbnail(file_path: Path, thumbnail_dir: Path = Path("thumbnails"), size: tuple = (200, 200)):
+BASE_PATH = Path("/media/mint/shared")  # Your actual files
 ```
 
-### Server Configuration
-Modify the server settings in the startup commands:
+**Default path**: `/media/mint/shared` (configured for 2TB NTFS partition)
 
-```bash
-# Change host and port
-uvicorn main:app --host 0.0.0.0 --port 8080
+### **Authentication Settings**
+Customize login credentials in `main.py`:
 
-# Enable debug mode
-uvicorn main:app --reload --log-level debug
+```python
+ADMIN_USERNAME = "admin"  # Change username
+ADMIN_PASSWORD = "admin"  # Change password
 ```
+
+### **Security Configuration**
+- **Session Duration**: 24 hours (configurable)
+- **Cookie Security**: HTTP-only, SameSite protection
+- **Honeypot Database**: Auto-created SQLite database
+- **Log Retention**: Configurable in honeypot settings
 
 ## 📚 API Reference
 
-### Endpoints
+### 🔒 **Secure Server Endpoints (Port 8000)**
+
+| Method | Endpoint | Auth Required | Description |
+|--------|----------|---------------|-------------|
+| `GET` | `/login` | ❌ | Login page |
+| `POST` | `/login` | ❌ | Authentication |
+| `GET` | `/logout` | ✅ | Session termination |
+| `GET` | `/` | ✅ | Main dashboard interface |
+| `GET` | `/file/{file_path}` | ✅ | Secure file serving |
+| `GET` | `/api/diagnostics` | ✅ | System stats (CPU, RAM, disk) |
+| `POST` | `/api/upload` | ✅ | File upload to folders |
+| `POST` | `/api/create-folder` | ✅ | Create new folders |
+| `GET` | `/api/folder-contents` | ✅ | Get folder contents |
+| `GET` | `/api/download/{file_path}` | ✅ | Secure file downloads |
+| `GET` | `/api/thumbnail/{file_path}` | ✅ | Media thumbnails |
+| `POST` | `/api/restart-samba` | ✅ | Restart Samba service |
+
+### 🍯 **Honeypot Endpoints (Port 8001)**
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `GET` | `/` | Main dashboard interface |
-| `GET` | `/file/{file_path}` | Direct file serving |
-| `GET` | `/api/diagnostics` | System stats (CPU, RAM, disk) |
-| `POST` | `/api/restart-samba` | Restart Samba service |
-| `GET` | `/api/folder-contents` | Get folder contents |
-| `GET` | `/api/download/{file_path}` | Download files with headers |
-| `GET` | `/api/thumbnail/{file_path}` | Get/generate thumbnails |
-| `GET` | `/api/models` | Available system services |
+| `GET` | `/` | Fake login page (captures attacks) |
+| `POST` | `/login` | Fake authentication (logs attempts) |
+| `GET` | `/dashboard` | Fake file browser |
+| `GET` | `/api/diagnostics` | Fake system stats |
+| `GET` | `/honeypot/admin` | Security monitoring dashboard |
+| `GET` | `/honeypot/api/attacks` | Attack data API |
 
 ### Example API Responses
 
@@ -151,6 +223,37 @@ uvicorn main:app --reload --log-level debug
 }
 ```
 
+**Honeypot Attack Data** (`/honeypot/api/attacks`):
+```json
+{
+  "login_attempts": [
+    {
+      "timestamp": "2024-01-15T10:30:45",
+      "ip_address": "192.168.1.100", 
+      "username": "admin",
+      "password": "password123",
+      "user_agent": "Mozilla/5.0...",
+      "session_id": "abc123"
+    }
+  ],
+  "sessions": [
+    {
+      "session_id": "abc123",
+      "ip_address": "192.168.1.100",
+      "total_requests": 5,
+      "attack_type": "login_attempt",
+      "start_time": "2024-01-15T10:30:00",
+      "last_activity": "2024-01-15T10:35:00"
+    }
+  ],
+  "stats": {
+    "total_attempts": 15,
+    "unique_attackers": 3,
+    "active_sessions": 1
+  }
+}
+```
+
 ## 🛠️ Development
 
 ### Adding New Features
@@ -178,21 +281,60 @@ curl http://localhost:8000/api/diagnostics
 curl "http://localhost:8000/api/folder-contents?folder_path=photos"
 ```
 
-## 🔒 Security Features
+## 🔒 Advanced Security Features
 
-- **Path Traversal Protection**: Prevents access outside the configured media directory
+### 🛡️ **Authentication & Access Control**
+- **Session-based Authentication**: Secure HTTP-only cookies with CSRF protection
+- **Path Traversal Protection**: Prevents access outside configured media directory
+- **Authorization Middleware**: All endpoints require valid authentication
+- **Session Timeout**: Automatic 24-hour session expiration
+- **Secure Redirects**: Unauthenticated users automatically redirected to login
+
+### 🍯 **Honeypot Security Intelligence**
+- **Attack Detection**: Real-time logging of intrusion attempts
+- **Behavioral Analysis**: Session tracking and attacker profiling
+- **Database Forensics**: SQLite database with comprehensive attack records
+- **Admin Dashboard**: Professional security monitoring interface
+- **Attack Statistics**: Real-time metrics and threat intelligence
+
+### 🔐 **Data Protection**
 - **File Access Validation**: Ensures files exist and are accessible before serving
-- **Sudo Access Control**: Secure service restart with timeout protection
 - **MIME Type Detection**: Proper content type headers for all file types
-- **Error Handling**: Comprehensive error responses for invalid requests
+- **Upload Security**: Secure file upload with folder organization
+- **Download Protection**: Authenticated downloads with proper headers
+- **Error Handling**: Comprehensive error responses without information disclosure
 
-## 🎯 Use Cases
+### 🚨 **Monitoring & Logging**
+- **Attack Logging**: All honeypot interactions logged to database and JSON files
+- **System Monitoring**: Real-time CPU, memory, and disk usage tracking
+- **Access Logs**: Comprehensive logging of all file access attempts
+- **Security Events**: Automated detection and logging of suspicious activities
 
-- **Home Media Server**: Browse and stream personal media collections
-- **NAS Management**: Visual interface for network-attached storage
-- **Server Monitoring**: Keep track of system performance
-- **File Sharing**: Easy download access for family/team members
-- **Media Organization**: Visual browsing of large media libraries
+## 🎯 Use Cases & Applications
+
+### 🏠 **Personal & Home Use**
+- **Secure Media Server**: Browse and stream personal media collections with authentication
+- **Family File Sharing**: Secure access to shared files across devices
+- **Photo/Video Management**: Organize and view media with thumbnail generation
+- **Home NAS Interface**: Visual management of network-attached storage
+
+### 🏢 **Professional & Enterprise**
+- **Secure File Hosting**: Enterprise-grade authentication and access control
+- **Cybersecurity Training**: Real honeypot for security education and testing
+- **Threat Intelligence**: Analyze attacker behavior and techniques
+- **Security Monitoring**: Professional-grade attack detection and logging
+
+### 🎓 **Educational & Research**
+- **Cybersecurity Portfolio**: Demonstrate security engineering skills
+- **Honeypot Research**: Study attacker behavior and techniques
+- **Security Analysis**: Forensic investigation of attack patterns
+- **Network Security**: Understanding of threat detection and response
+
+### 🚀 **Development & Deployment**
+- **Local Development**: Secure file server for development environments
+- **Dual-boot Systems**: Perfect for shared NTFS partitions (Windows/Linux)
+- **Container Deployment**: Docker-ready architecture
+- **Network Deployment**: Remote access with VPN integration
 
 ## 🤝 Contributing
 
@@ -210,41 +352,97 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ### Common Issues
 
-**Server won't start**
-- Check if port 8000 is available
-- Ensure all dependencies are installed
-- Verify Python 3.10+ is being used
+**🚀 System Startup Problems**
+- **Port conflicts**: Ensure ports 8000 and 8001 are available
+- **Dependencies**: Run `pip install -r requirements.txt` in virtual environment
+- **Python version**: Verify Python 3.10+ is being used
+- **Permissions**: Check that script has execution permissions
 
-**Thumbnails not generating**
-- Install OpenCV: `pip install opencv-python-headless`
-- Check file permissions in thumbnails directory
-- Verify media files are not corrupted
+**🔐 Authentication Issues**
+- **Login fails**: Default credentials are `admin`/`admin`
+- **Session expired**: Sessions last 24 hours, re-login if needed
+- **Cookie problems**: Clear browser cookies and try again
+- **Redirect loops**: Check if both servers are running properly
 
-**Samba restart fails**
-- Ensure user has sudo privileges
-- Check if Samba service exists: `systemctl status smbd`
-- Verify sudo access without password prompt
+**📁 File Access Problems**
+- **Path not found**: Verify `/media/mint/shared` exists and is readable
+- **Permission denied**: Check file/directory permissions
+- **Empty folders**: Ensure BASE_PATH is correctly configured
+- **Upload fails**: Check target directory write permissions
 
-**Files not accessible**
-- Check media directory permissions
-- Ensure BASE_PATH is correctly configured
-- Verify files exist and are readable
+**🍯 Honeypot Issues**
+- **Admin panel inaccessible**: Only works from localhost
+- **No attack data**: Database auto-creates, check honeypot/database/
+- **Logging not working**: Check honeypot/logs/ directory permissions
 
-### Getting Help
+**🖼️ Media & Thumbnails**
+- **Thumbnails not generating**: Install OpenCV: `pip install opencv-python-headless`
+- **Images not loading**: Check file permissions and MIME type support
+- **Video playback issues**: Verify browser supports video format
+
+**🔧 Service Control Problems**
+- **Samba restart fails**: Ensure user has sudo privileges without password
+- **Service not found**: Check if Samba is installed: `systemctl status smbd`
+- **Timeout errors**: Increase timeout in restart command
+
+### 🔍 Debug Information
+
+**Check System Status:**
+```bash
+# Verify both servers are running
+curl http://localhost:8000  # Should redirect to login
+curl http://localhost:8001  # Should show honeypot login
+
+# Check honeypot admin (localhost only)
+curl http://localhost:8001/honeypot/admin
+
+# Test authentication
+curl -X POST -d "username=admin&password=admin" http://localhost:8000/login
+```
+
+**Log Locations:**
+- **System logs**: Check terminal output from `start.py`
+- **Honeypot attacks**: `honeypot/database/honeypot.db`
+- **Attack logs**: `honeypot/logs/honeypot_YYYYMMDD.log`
+- **Thumbnails**: `thumbnails/` directory
+
+### 📞 Getting Help
 
 If you encounter issues:
-1. Check the logs in the `logs/` directory
-2. Enable debug mode for detailed error messages
-3. Verify all dependencies are correctly installed
-4. Check file and directory permissions
+1. **Check logs**: Review terminal output and log files
+2. **Verify setup**: Ensure all dependencies are installed
+3. **Test components**: Try accessing each service individually
+4. **Security check**: Verify honeypot is capturing attacks properly
+5. **Documentation**: Review honeypot/README.md for additional details
 
 ## 🌟 Acknowledgments
 
-- Built with [FastAPI](https://fastapi.tiangolo.com/) for the backend
-- Styled with Google Drive-inspired design principles
-- Uses [OpenCV](https://opencv.org/) for video thumbnail generation
-- Powered by [Pillow](https://pillow.readthedocs.io/) for image processing
+### 🛠️ **Technology Stack**
+- **Backend Framework**: [FastAPI](https://fastapi.tiangolo.com/) - Modern, fast web framework
+- **Authentication**: Session-based security with HTTP-only cookies
+- **Database**: SQLite for honeypot attack logging
+- **Media Processing**: [OpenCV](https://opencv.org/) for video thumbnails
+- **Image Processing**: [Pillow](https://pillow.readthedocs.io/) for image manipulation
+- **UI Design**: Google Drive-inspired modern interface
+- **Security**: Professional honeypot implementation
+
+### 🎯 **Project Goals**
+- **Enterprise Security**: Production-ready authentication and access control
+- **Threat Intelligence**: Real-world honeypot for cybersecurity analysis
+- **User Experience**: Intuitive, responsive file management interface
+- **Educational Value**: Demonstrate security engineering principles
+- **Practical Application**: Secure hosting for personal/family file sharing
+
+### 🏆 **Features Achieved**
+- ✅ **Dual-server Architecture**: Secure server + honeypot integration
+- ✅ **Enterprise Authentication**: Session management and access control
+- ✅ **Real-time Security Monitoring**: Live attack detection and analysis
+- ✅ **Professional UI/UX**: Google Drive-style interface
+- ✅ **Complete File Management**: Upload, download, organize, preview
+- ✅ **Advanced Security**: Path protection, session security, attack logging
 
 ---
 
-**Made with ❤️ for modern media management**
+**🔒 Built for Security, Designed for Usability, Engineered for Excellence**
+
+*Perfect for cybersecurity portfolios, secure file hosting, and threat intelligence research.*
