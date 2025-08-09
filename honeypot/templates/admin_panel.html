@@ -100,7 +100,7 @@
     }
 
     .log-container {
-      max-height: 400px;
+      max-height: 500px;
       overflow-y: auto;
       background: #1a1a1a;
       border-radius: 6px;
@@ -109,9 +109,11 @@
 
     .log-entry {
       border-bottom: 1px solid #404040;
-      padding: 10px 0;
+      padding: 15px 0;
       font-family: 'Courier New', monospace;
       font-size: 13px;
+      line-height: 1.4;
+      word-break: break-all;
     }
 
     .log-entry:last-child {
@@ -156,10 +158,11 @@
 
     .session-entry {
       background: #1a1a1a;
-      margin: 10px 0;
-      padding: 15px;
+      margin: 15px 0;
+      padding: 20px;
       border-radius: 6px;
       border-left: 4px solid #ff6b35;
+      word-break: break-all;
     }
 
     .session-header {
@@ -268,7 +271,8 @@
               IP: <span class="log-ip">${attempt.ip_address}</span> | 
               User: <span class="log-username">${attempt.username}</span> | 
               Pass: <span class="log-password">${attempt.password}</span><br>
-              <small>Session: ${attempt.session_id} | Agent: ${attempt.user_agent.substring(0, 50)}...</small>
+              <small>Session: ${attempt.session_id}</small><br>
+              <small>User Agent: ${attempt.user_agent}</small>
             `;
             loginContainer.appendChild(entry);
           });
@@ -292,9 +296,10 @@
                 </span>
               </div>
               <div class="session-details">
-                IP: ${session.ip_address} | 
-                Started: ${new Date(session.start_time).toLocaleString()} | 
-                Last: ${new Date(session.last_activity).toLocaleString()}
+                <strong>IP Address:</strong> ${session.ip_address}<br>
+                <strong>Started:</strong> ${new Date(session.start_time).toLocaleString()}<br>
+                <strong>Last Activity:</strong> ${new Date(session.last_activity).toLocaleString()}<br>
+                <strong>User Agent:</strong> ${session.user_agent || 'Unknown'}
               </div>
             `;
             sessionsContainer.appendChild(sessionDiv);
