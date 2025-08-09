@@ -227,8 +227,16 @@ async def fake_api_diagnostics(request: Request):
 @app.get("/honeypot/admin")
 async def honeypot_admin(request: Request):
     """Admin panel to view captured attacks"""
-    # Only allow local access
-    if request.client.host not in ["127.0.0.1", "localhost"]:
+    # Only allow local network access (localhost + private IP ranges)
+    client_ip = request.client.host
+    allowed_networks = [
+        "127.0.0.1", "localhost", "::1",  # Localhost
+        "192.168.", "10.", "172.16.", "172.17.", "172.18.", "172.19.",
+        "172.20.", "172.21.", "172.22.", "172.23.", "172.24.", "172.25.",
+        "172.26.", "172.27.", "172.28.", "172.29.", "172.30.", "172.31."
+    ]
+    
+    if not any(client_ip.startswith(network) for network in allowed_networks):
         raise HTTPException(status_code=404, detail="Not found")
     
     return templates.TemplateResponse("admin_panel.html", {"request": request})
@@ -236,7 +244,16 @@ async def honeypot_admin(request: Request):
 @app.get("/honeypot/api/attacks")
 async def get_attack_data(request: Request):
     """API to get attack data for admin panel"""
-    if request.client.host not in ["127.0.0.1", "localhost"]:
+    # Only allow local network access (localhost + private IP ranges)
+    client_ip = request.client.host
+    allowed_networks = [
+        "127.0.0.1", "localhost", "::1",  # Localhost
+        "192.168.", "10.", "172.16.", "172.17.", "172.18.", "172.19.",
+        "172.20.", "172.21.", "172.22.", "172.23.", "172.24.", "172.25.",
+        "172.26.", "172.27.", "172.28.", "172.29.", "172.30.", "172.31."
+    ]
+    
+    if not any(client_ip.startswith(network) for network in allowed_networks):
         raise HTTPException(status_code=404, detail="Not found")
     
     db_path = HONEYPOT_DIR / "database" / "honeypot.db"
