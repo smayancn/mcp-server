@@ -27,6 +27,30 @@ function setupEventListeners() {
     if (refreshStatsBtn) {
         refreshStatsBtn.addEventListener("click", updateSystemStats);
     }
+    
+    // Upload button
+    const uploadBtn = document.getElementById("upload-btn");
+    if (uploadBtn) {
+        uploadBtn.addEventListener("click", openUploadModal);
+    }
+    
+    // Create folder button
+    const createFolderBtn = document.getElementById("create-folder-btn");
+    if (createFolderBtn) {
+        createFolderBtn.addEventListener("click", openFolderModal);
+    }
+    
+    // Upload form
+    const uploadForm = document.getElementById("upload-form");
+    if (uploadForm) {
+        uploadForm.addEventListener("submit", handleFileUpload);
+    }
+    
+    // Folder form
+    const folderForm = document.getElementById("folder-form");
+    if (folderForm) {
+        folderForm.addEventListener("submit", handleCreateFolder);
+    }
 }
 
 // Update system statistics in the header
@@ -119,7 +143,7 @@ async function loadFolderContents(folderPath, buttonElement) {
         folderContents.style.display = 'none';
         
         // Update breadcrumb
-        breadcrumb.textContent = `📍 Current Path: /media/nas/${folderPath}`;
+        breadcrumb.textContent = `📍 Current Path: /media/mint/shared/${folderPath}`;
         
         // Store current path
         currentFolderPath = folderPath;
@@ -402,5 +426,139 @@ if (!document.querySelector("#modal-styles")) {
     style.id = "modal-styles";
     style.textContent = modalStyles;
     document.head.appendChild(style);
+}
+
+// === UPLOAD FUNCTIONALITY ===
+
+// Open upload modal
+function openUploadModal() {
+    const modal = document.getElementById("upload-modal");
+    const folderInput = document.getElementById("upload-folder");
+    
+    // Set current folder path
+    folderInput.value = currentFolderPath || "";
+    
+    modal.style.display = "flex";
+}
+
+// Close upload modal
+function closeUploadModal() {
+    const modal = document.getElementById("upload-modal");
+    const form = document.getElementById("upload-form");
+    
+    modal.style.display = "none";
+    form.reset();
+}
+
+// Handle file upload
+async function handleFileUpload(event) {
+    event.preventDefault();
+    
+    const form = event.target;
+    const formData = new FormData();
+    const fileInput = document.getElementById("file-input");
+    const folderPath = document.getElementById("upload-folder").value;
+    
+    // Add files to form data
+    for (let file of fileInput.files) {
+        formData.append("file", file);
+        formData.append("folder_path", folderPath);
+        
+        try {
+            showNotification(`📤 Uploading ${file.name}...`, "info");
+            
+            const response = await fetch("/api/upload", {
+                method: "POST",
+                body: formData
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok && data.status === "success") {
+                showNotification(`✅ ${data.message}`, "success");
+            } else {
+                showNotification(`❌ Upload failed: ${data.message}`, "error");
+            }
+        } catch (error) {
+            console.error("Upload error:", error);
+            showNotification(`❌ Error uploading ${file.name}`, "error");
+        }
+        
+        // Clear form data for next file
+        formData.delete("file");
+        formData.delete("folder_path");
+    }
+    
+    // Close modal and refresh folder contents
+    closeUploadModal();
+    
+    // Refresh current folder view
+    if (currentFolderPath) {
+        const activeButton = document.querySelector('.folder-btn.active');
+        if (activeButton) {
+            setTimeout(() => {
+                loadFolderContents(currentFolderPath, activeButton);
+            }, 1000);
+        }
+    }
+}
+
+// Open create folder modal
+function openFolderModal() {
+    const modal = document.getElementById("folder-modal");
+    const parentInput = document.getElementById("parent-folder");
+    
+    // Set current folder path
+    parentInput.value = currentFolderPath || "";
+    
+    modal.style.display = "flex";
+}
+
+// Close create folder modal
+function closeFolderModal() {
+    const modal = document.getElementById("folder-modal");
+    const form = document.getElementById("folder-form");
+    
+    modal.style.display = "none";
+    form.reset();
+}
+
+// Handle create folder
+async function handleCreateFolder(event) {
+    event.preventDefault();
+    
+    const form = event.target;
+    const formData = new FormData(form);
+    
+    try {
+        showNotification("📁 Creating folder...", "info");
+        
+        const response = await fetch("/api/create-folder", {
+            method: "POST",
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok && data.status === "success") {
+            showNotification(`✅ ${data.message}`, "success");
+            closeFolderModal();
+            
+            // Refresh current folder view
+            if (currentFolderPath) {
+                const activeButton = document.querySelector('.folder-btn.active');
+                if (activeButton) {
+                    setTimeout(() => {
+                        loadFolderContents(currentFolderPath, activeButton);
+                    }, 1000);
+                }
+            }
+        } else {
+            showNotification(`❌ Failed to create folder: ${data.message}`, "error");
+        }
+    } catch (error) {
+        console.error("Create folder error:", error);
+        showNotification("❌ Error creating folder", "error");
+    }
 }
 

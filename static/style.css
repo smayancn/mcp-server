@@ -336,6 +336,61 @@ body {
 }
 
 /* Responsive design */
+/* Form Styles */
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 500;
+  color: #202124;
+}
+
+.form-group input[type="text"],
+.form-group input[type="file"] {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  font-size: 14px;
+  background: #fff;
+}
+
+.form-group input[type="text"]:focus,
+.form-group input[type="file"]:focus {
+  outline: none;
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+}
+
+.form-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.modal-content h3 {
+  margin: 0 0 20px 0;
+  color: #202124;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.modal {
+  background: rgba(0, 0, 0, 0.5) !important;
+}
+
+.modal-content {
+  background: white !important;
+  padding: 24px !important;
+  border-radius: 8px !important;
+  max-width: 500px !important;
+  width: 90% !important;
+}
+
 @media (max-width: 768px) {
   .container {
     flex-direction: column;
@@ -354,6 +409,17 @@ body {
   
   .media-container {
     height: 120px;
+  }
+  
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  
+  .control-btn {
+    font-size: 12px;
+    padding: 6px 12px;
   }
 }
 

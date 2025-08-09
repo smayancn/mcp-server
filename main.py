@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, UploadFile, File, Form
 from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -7,11 +7,12 @@ import mimetypes
 import psutil
 import subprocess
 import shutil
+import aiofiles
 from utils import get_directory_structure, get_file_list, get_folder_contents, generate_thumbnail  # defined in utils.py
 
 app = FastAPI()
 
-BASE_PATH = Path("/media/nas")  # Or wherever your files are mounted
+BASE_PATH = Path("/media/mint/shared")  # NTFS shared partition
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
@@ -183,4 +184,76 @@ async def download_file(file_path: str):
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error downloading file: {str(e)}")
+
+
+@app.post("/api/upload")
+async def upload_file(file: UploadFile = File(...), folder_path: str = Form("")):
+    """Upload a file to the specified folder"""
+    try:
+        # Determine target directory
+        if folder_path:
+            target_dir = (BASE_PATH / folder_path).resolve()
+        else:
+            target_dir = BASE_PATH
+            
+        # Security check - ensure we're not going outside BASE_PATH
+        if not str(target_dir).startswith(str(BASE_PATH)):
+            raise HTTPException(status_code=403, detail="Access denied")
+            
+        # Create directory if it doesn't exist
+        target_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Construct file path
+        file_path = target_dir / file.filename
+        
+        # Check if file already exists
+        if file_path.exists():
+            # Add timestamp to make it unique
+            import time
+            timestamp = int(time.time())
+            name, ext = file.filename.rsplit('.', 1) if '.' in file.filename else (file.filename, '')
+            new_filename = f"{name}_{timestamp}.{ext}" if ext else f"{name}_{timestamp}"
+            file_path = target_dir / new_filename
+        
+        # Save the file
+        async with aiofiles.open(file_path, 'wb') as f:
+            content = await file.read()
+            await f.write(content)
+        
+        return {
+            "status": "success", 
+            "message": f"File '{file.filename}' uploaded successfully",
+            "file_path": str(file_path.relative_to(BASE_PATH))
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error uploading file: {str(e)}")
+
+
+@app.post("/api/create-folder")
+async def create_folder(folder_name: str = Form(...), parent_path: str = Form("")):
+    """Create a new folder"""
+    try:
+        # Determine parent directory
+        if parent_path:
+            parent_dir = (BASE_PATH / parent_path).resolve()
+        else:
+            parent_dir = BASE_PATH
+            
+        # Security check
+        if not str(parent_dir).startswith(str(BASE_PATH)):
+            raise HTTPException(status_code=403, detail="Access denied")
+            
+        # Create new folder
+        new_folder = parent_dir / folder_name
+        new_folder.mkdir(parents=True, exist_ok=True)
+        
+        return {
+            "status": "success", 
+            "message": f"Folder '{folder_name}' created successfully",
+            "folder_path": str(new_folder.relative_to(BASE_PATH))
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error creating folder: {str(e)}")
 

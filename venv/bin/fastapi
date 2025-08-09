@@ -1,4 +1,4 @@
-#!/home/smayan/mcp-server/venv/bin/python3
+#!/home/mint/Desktop/mcp-server/venv/bin/python3
 # -*- coding: utf-8 -*-
 import re
 import sys

@@ -32,6 +32,8 @@
       <div class="controls">
         <button class="control-btn" id="restart-samba">🔄 Restart Samba</button>
         <button class="control-btn secondary" id="refresh-stats">📊 Refresh Stats</button>
+        <button class="control-btn" id="upload-btn">📤 Upload File</button>
+        <button class="control-btn secondary" id="create-folder-btn">📁 New Folder</button>
       </div>
       
       <h2>📁 Root Folders</h2>
@@ -50,7 +52,7 @@
     <!-- Main Panel -->
     <div class="main-panel">
       <div class="breadcrumb">
-        📍 Current Path: /media/nas{% if current_path %}/{{ current_path }}{% endif %}
+        📍 Current Path: /media/mint/shared{% if current_path %}/{{ current_path }}{% endif %}
       </div>
       
       <div class="content-area" id="content-area">
@@ -66,6 +68,50 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Upload Modal -->
+  <div id="upload-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeUploadModal()">&times;</button>
+      <h3>📤 Upload File</h3>
+      <form id="upload-form" enctype="multipart/form-data">
+        <div class="form-group">
+          <label for="file-input">Select File:</label>
+          <input type="file" id="file-input" name="file" multiple required>
+        </div>
+        <div class="form-group">
+          <label for="upload-folder">Upload to folder:</label>
+          <input type="text" id="upload-folder" name="folder_path" placeholder="Leave empty for root folder" readonly>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="control-btn">Upload</button>
+          <button type="button" class="control-btn secondary" onclick="closeUploadModal()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Create Folder Modal -->
+  <div id="folder-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeFolderModal()">&times;</button>
+      <h3>📁 Create New Folder</h3>
+      <form id="folder-form">
+        <div class="form-group">
+          <label for="folder-name">Folder Name:</label>
+          <input type="text" id="folder-name" name="folder_name" required>
+        </div>
+        <div class="form-group">
+          <label for="parent-folder">Create in folder:</label>
+          <input type="text" id="parent-folder" name="parent_path" placeholder="Leave empty for root folder" readonly>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="control-btn">Create</button>
+          <button type="button" class="control-btn secondary" onclick="closeFolderModal()">Cancel</button>
+        </div>
+      </form>
     </div>
   </div>
 
