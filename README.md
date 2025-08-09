@@ -12,6 +12,22 @@ Port 8000: Secure File Server    (Your real files - authenticated access)
 Port 8001: Security Honeypot     (Captures attackers - fake interface)
 ```
 
+### Interface Previews
+
+#### Secure File Server (Port 8000)
+**Real Login Page** - Secure authentication for legitimate users:
+![Real Login Page](real_login.png)
+
+**Media Center Dashboard** - Google Drive-style file management interface:
+![Media Center Dashboard](media_center.png)
+
+#### Security Honeypot (Port 8001)
+**Fake Login Page** - Captures attacker credentials:
+![Fake Login Page](fake_login.png)
+
+**Honeypot Admin Panel** - Real-time security monitoring dashboard:
+![Honeypot Admin Panel](honeypot_admin.png)
+
 ## Core Features
 
 ### Enterprise Authentication
